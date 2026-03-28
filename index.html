@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Courier New', monospace;
+    background: #0f0f14;
+    color: #e0e0e0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .container {
+    width: 100%;
+    max-width: 860px;
+  }
+  h1 {
+    font-size: 1rem;
+    color: #ff79c6;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+  }
+  .section-label {
+    font-size: 0.6rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .map-row {
+    background: #1a1a24;
+    border: 1px solid #2a2a3a;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    display: grid;
+    grid-template-columns: 72px 1fr 1fr;
+    gap: 8px;
+    align-items: center;
+  }
+  .map-label {
+    display: inline-block;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+  .jacks { background: #3d1a4a; color: #d06ef5; }
+  .tech  { background: #1a3a4a; color: #6eb8f5; }
+  .speed { background: #4a3a1a; color: #f5c86e; }
+  .stam  { background: #1a4a2a; color: #6ef5a0; }
+
+  label {
+    display: block;
+    font-size: 0.65rem;
+    color: #888;
+    margin-bottom: 3px;
+  }
+  input[type="number"] {
+    width: 100%;
+    background: #0f0f14;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    padding: 5px 7px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type="number"]:focus { border-color: #ff79c6; }
+
+  button {
+    width: 100%;
+    background: #ff79c6;
+    color: #0f0f14;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    font-weight: bold;
+    padding: 9px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: opacity 0.15s;
+    margin-top: 6px;
+  }
+  button:hover { opacity: 0.85; }
+  button:active { opacity: 0.7; }
+
+  .error {
+    color: #f56e6e;
+    font-size: 0.75rem;
+    margin-top: 6px;
+    display: none;
+  }
+  .error.visible { display: block; }
+
+  .results { margin-top: 14px; display: none; }
+  .results.visible { display: block; }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    background: #1a1a24;
+    border: 1px solid #2a2a3a;
+  }
+  .result-val { font-size: 1rem; font-weight: bold; }
+  .good { color: #6ef5a0; }
+  .ok   { color: #f5c86e; }
+  .bad  { color: #f56e6e; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>// osu!mania Dan — Калькулятор аккуратности</h1>
+  <div class="section-label">Данные по картам</div>
+
+  <div class="map-row">
+    <div><span class="map-label jacks">ДЖЕКИ</span></div>
+    <div><label>Нот</label><input type="number" id="n_jacks" placeholder="1000" min="1"></div>
+    <div><label>Акк после (%)</label><input type="number" id="a_jacks" placeholder="96.50" step="0.01" min="0" max="100"></div>
+  </div>
+
+  <div class="map-row">
+    <div><span class="map-label tech">ТЕХНО</span></div>
+    <div><label>Нот</label><input type="number" id="n_tech" placeholder="800" min="1"></div>
+    <div><label>Акк после (%)</label><input type="number" id="a_tech" placeholder="95.20" step="0.01" min="0" max="100"></div>
+  </div>
+
+  <div class="map-row">
+    <div><span class="map-label speed">СПИД</span></div>
+    <div><label>Нот</label><input type="number" id="n_speed" placeholder="1200" min="1"></div>
+    <div><label>Акк после (%)</label><input type="number" id="a_speed" placeholder="94.80" step="0.01" min="0" max="100"></div>
+  </div>
+
+  <div class="map-row">
+    <div><span class="map-label stam">СТАМИНА</span></div>
+    <div><label>Нот</label><input type="number" id="n_stam" placeholder="1500" min="1"></div>
+    <div><label>Акк после (%)</label><input type="number" id="a_stam" placeholder="93.50" step="0.01" min="0" max="100"></div>
+  </div>
+
+  <div class="error" id="error">⚠ Заполни все поля корректно</div>
+  <button onclick="calculate()">ПОСЧИТАТЬ</button>
+
+  <div class="results" id="results">
+    <div style="margin-bottom:8px; margin-top:14px;" class="section-label">Индивидуальная аккуратность</div>
+    <div class="result-row">
+      <span class="map-label jacks">ДЖЕКИ</span>
+      <span class="result-val" id="r_jacks">—</span>
+    </div>
+    <div class="result-row">
+      <span class="map-label tech">ТЕХНО</span>
+      <span class="result-val" id="r_tech">—</span>
+    </div>
+    <div class="result-row">
+      <span class="map-label speed">СПИД</span>
+      <span class="result-val" id="r_speed">—</span>
+    </div>
+    <div class="result-row">
+      <span class="map-label stam">СТАМИНА</span>
+      <span class="result-val" id="r_stam">—</span>
+    </div>
+  </div>
+
+</div>
+<script>
+  function colorClass(v) {
+    if (v >= 97) return 'good';
+    if (v >= 93) return 'ok';
+    return 'bad';
+  }
+  function getIndividual(xPast, xNew, nPast, nNew) {
+    return ((xNew / 100 * (nPast + nNew) - xPast / 100 * nPast) / nNew) * 100;
+  }
+  function setResult(id, val) {
+    const el = document.getElementById(id);
+    el.textContent = val.toFixed(2) + '%';
+    el.className = 'result-val ' + colorClass(val);
+  }
+  function calculate() {
+    const nJ  = parseFloat(document.getElementById('n_jacks').value);
+    const nT  = parseFloat(document.getElementById('n_tech').value);
+    const nS  = parseFloat(document.getElementById('n_speed').value);
+    const nSt = parseFloat(document.getElementById('n_stam').value);
+    const aJ  = parseFloat(document.getElementById('a_jacks').value);
+    const aT  = parseFloat(document.getElementById('a_tech').value);
+    const aS  = parseFloat(document.getElementById('a_speed').value);
+    const aSt = parseFloat(document.getElementById('a_stam').value);
+    const err = document.getElementById('error');
+    if ([nJ,nT,nS,nSt,aJ,aT,aS,aSt].some(isNaN)) {
+      err.classList.add('visible');
+      document.getElementById('results').classList.remove('visible');
+      return;
+    }
+    err.classList.remove('visible');
+    setResult('r_jacks', aJ);
+    setResult('r_tech',  getIndividual(aJ, aT, nJ, nT));
+    setResult('r_speed', getIndividual(aT, aS, nJ + nT, nS));
+    setResult('r_stam',  getIndividual(aS, aSt, nJ + nT + nS, nSt));
+    document.getElementById('results').classList.add('visible');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+</script>
+</body>
+</html>
