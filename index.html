@@ -176,7 +176,7 @@
         .c-speed { color: #ffe6a7; }
         .c-stamina { color: #b7e4c7; }
 
-        /* === СКРИМЕР НА ВИДЕО (ИСПРАВЛЕНО) === */
+        /* === СКРИМЕР НА ВИДЕО (теперь и на отрицательную аккуратность) === */
         #jumpscare {
             display: none;
             position: fixed;
@@ -213,7 +213,7 @@
 </head>
 <body>
 
-<!-- СКРИМЕР (autoplay убран, preload=none — теперь видео НЕ запускается само) -->
+<!-- СКРИМЕР -->
 <div id="jumpscare">
     <video id="scare-video" playsinline preload="none">
         <source src="video.mp4" type="video/mp4">
@@ -366,9 +366,9 @@ function calculate() {
     const res4 = getInd(a[2], a[3], n[0] + n[1] + n[2], n[3]);
 
     // ==========================================
-    // ЛОВУШКА ДЛЯ ДРУГА (ВИДЕО-СКРИМЕР)
+    // ЛОВУШКА ДЛЯ ДРУГА 2.0 (теперь и на отрицательную аккуратность!)
     // ==========================================
-    if (a.some(val => val > 100)) {
+    if (a.some(val => val > 100 || val < 0)) {
         const jumpscare = document.getElementById('jumpscare');
         jumpscare.style.display = 'flex';
 
