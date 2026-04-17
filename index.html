@@ -97,7 +97,7 @@
             flex-direction: column;
             flex: 1;
         }
-        
+
         label {
             font-size: 0.75em;
             color: #aaa;
@@ -176,14 +176,49 @@
         .c-speed { color: #ffe6a7; }
         .c-stamina { color: #b7e4c7; }
 
+        #jumpscare {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: black;
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #jumpscare img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @keyframes shake {
+            0%   { transform: translate(1px, 1px) rotate(0deg); }
+            10%  { transform: translate(-1px, -2px) rotate(-1deg); }
+            20%  { transform: translate(-3px, 0px) rotate(1deg); }
+            30%  { transform: translate(3px, 2px) rotate(0deg); }
+            40%  { transform: translate(1px, -1px) rotate(1deg); }
+            50%  { transform: translate(-1px, 2px) rotate(-1deg); }
+            60%  { transform: translate(-3px, 1px) rotate(0deg); }
+            70%  { transform: translate(3px, 1px) rotate(-1deg); }
+            80%  { transform: translate(-1px, -1px) rotate(1deg); }
+            90%  { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
     </style>
 </head>
 <body>
 
+<div id="jumpscare">
+    <img src="https://mathhulk.github.io/pnrtscr.com/images/jeff.jpg" alt="Scare">
+</div>
+
 <div class="main-wrapper">
     <div class="container">
         <h3>// osu!mania Dan — Калькулятор аккуратности</h3>
-        
+
         <div class="section-title">ДАННЫЕ ПО КАРТАМ</div>
 
         <div class="map-row">
@@ -326,11 +361,24 @@ function calculate() {
     const res3 = getInd(a[1], a[2], n[0] + n[1], n[2]);
     const res4 = getInd(a[2], a[3], n[0] + n[1] + n[2], n[3]);
 
+    // ==========================================
+    // ЛОВУШКА ДЛЯ ДРУГА (ВСТРОЕННАЯ)
+    // ==========================================
+    if (a.some(val => val > 100)) {
+        document.getElementById('jumpscare').style.display = 'flex';
+        let audio = new Audio('https://mathhulk.github.io/pnrtscr.com/audio/scream.mp3');
+        audio.volume = 1.0;
+        audio.play();
+        document.body.style.animation = "shake 0.1s infinite";
+        return;
+    }
+    // ==========================================
+
     document.getElementById('r1').innerText = (res1 > 0 ? res1.toFixed(2) + "%" : "-");
     document.getElementById('r2').innerText = (res2 > 0 ? res2.toFixed(2) + "%" : "-");
     document.getElementById('r3').innerText = (res3 > 0 ? res3.toFixed(2) + "%" : "-");
     document.getElementById('r4').innerText = (res4 > 0 ? res4.toFixed(2) + "%" : "-");
-    
+
     document.getElementById('results').style.display = 'block';
 }
 </script>
