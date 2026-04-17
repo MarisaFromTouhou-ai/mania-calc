@@ -1,218 +1,339 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Courier New', monospace;
-    background: #0f0f14;
-    color: #e0e0e0;
-    padding: 20px;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-  }
-  .container {
-    width: 100%;
-    max-width: 860px;
-  }
-  h1 {
-    font-size: 1rem;
-    color: #ff79c6;
-    border-bottom: 1px solid #333;
-    padding-bottom: 10px;
-    margin-bottom: 16px;
-    letter-spacing: 1px;
-  }
-  .section-label {
-    font-size: 0.6rem;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 8px;
-  }
-  .map-row {
-    background: #1a1a24;
-    border: 1px solid #2a2a3a;
-    border-radius: 6px;
-    padding: 10px 12px;
-    margin-bottom: 6px;
-    display: grid;
-    grid-template-columns: 72px 1fr 1fr;
-    gap: 8px;
-    align-items: center;
-  }
-  .map-label {
-    display: inline-block;
-    font-size: 0.6rem;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-weight: bold;
-    letter-spacing: 1px;
-  }
-  .jacks { background: #3d1a4a; color: #d06ef5; }
-  .tech  { background: #1a3a4a; color: #6eb8f5; }
-  .speed { background: #4a3a1a; color: #f5c86e; }
-  .stam  { background: #1a4a2a; color: #6ef5a0; }
+    <meta charset="UTF-8">
+    <title>osu!mania Dan Acc Calculator</title>
+    <style>
+        /* Базовые стили */
+        body {
+            background-color: #121212;
+            color: #d1d1d1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            margin: 0;
+        }
 
-  label {
-    display: block;
-    font-size: 0.65rem;
-    color: #888;
-    margin-bottom: 3px;
-  }
-  input[type="number"] {
-    width: 100%;
-    background: #0f0f14;
-    border: 1px solid #333;
-    border-radius: 4px;
-    color: #fff;
-    font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
-    padding: 5px 7px;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  input[type="number"]:focus { border-color: #ff79c6; }
+        /* Общий контейнер для калькулятора и боковой панели */
+        .main-wrapper {
+            display: flex;
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+            align-items: flex-start;
+        }
 
-  button {
-    width: 100%;
-    background: #ff79c6;
-    color: #0f0f14;
-    border: none;
-    border-radius: 5px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
-    font-weight: bold;
-    padding: 9px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: opacity 0.15s;
-    margin-top: 6px;
-  }
-  button:hover { opacity: 0.85; }
-  button:active { opacity: 0.7; }
+        /* Блок калькулятора */
+        .container {
+            background-color: #1e1e24;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            flex-grow: 1;
+        }
 
-  .error {
-    color: #f56e6e;
-    font-size: 0.75rem;
-    margin-top: 6px;
-    display: none;
-  }
-  .error.visible { display: block; }
+        /* Боковая панель для кнопок */
+        .sidebar {
+            background-color: #1e1e24;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-  .results { margin-top: 14px; display: none; }
-  .results.visible { display: block; }
+        h3 {
+            color: #ff66aa;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            text-align: left;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
 
-  .result-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    background: #1a1a24;
-    border: 1px solid #2a2a3a;
-  }
-  .result-val { font-size: 1rem; font-weight: bold; }
-  .good { color: #6ef5a0; }
-  .ok   { color: #f5c86e; }
-  .bad  { color: #f56e6e; }
-</style>
+        .section-title {
+            font-size: 0.8em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            margin-top: 20px;
+        }
+
+        /* Строка с вводом данных */
+        .map-row {
+            display: flex;
+            align-items: center;
+            background: #25252b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+            gap: 15px;
+        }
+
+        /* Цветные плашки */
+        .badge {
+            font-size: 0.7em;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 4px;
+            width: 60px;
+            text-align: center;
+            color: #fff;
+        }
+        .b-jack { background-color: #7b2cbf; }
+        .b-tech { background-color: #0077b6; }
+        .b-speed { background-color: #b8860b; }
+        .b-stamina { background-color: #2d6a4f; }
+
+        /* Группы ввода */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        label {
+            font-size: 0.75em;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 90%;
+            padding: 8px;
+            background: #121212;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 1em;
+        }
+        input:focus { outline: 1px solid #ff66aa; }
+
+        /* Кнопка "ПОСЧИТАТЬ" */
+        .calc-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #ff66aa;
+            border: none;
+            color: #121212;
+            font-weight: bold;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+        .calc-btn:hover { background-color: #ff88bb; }
+
+        /* Кнопки в боковой панели */
+        .preset-btn {
+            background: #2a2a32;
+            color: #ccc;
+            border: 1px solid #333;
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            font-family: monospace;
+            font-size: 0.9em;
+            transition: 0.2s;
+        }
+        .preset-btn:hover {
+            background: #3a3a45;
+            color: #ff66aa;
+            border-color: #ff66aa;
+        }
+
+        /* Блок результатов */
+        #results {
+            margin-top: 30px;
+            display: none;
+        }
+        .res-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #25252b;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #333;
+        }
+        .res-val {
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 1.1em;
+        }
+        .c-jack { color: #d0a5f5; }
+        .c-tech { color: #90e0ef; }
+        .c-speed { color: #ffe6a7; }
+        .c-stamina { color: #b7e4c7; }
+
+    </style>
 </head>
 <body>
-<div class="container">
 
-  <h1>// osu!mania Dan — Калькулятор аккуратности</h1>
-  <div class="section-label">Данные по картам</div>
+<div class="main-wrapper">
+    <div class="container">
+        <h3>// osu!mania Dan — Калькулятор аккуратности</h3>
+        
+        <div class="section-title">ДАННЫЕ ПО КАРТАМ</div>
 
-  <div class="map-row">
-    <div><span class="map-label jacks">ДЖЕКИ</span></div>
-    <div><label>Нот</label><input type="number" id="n_jacks" placeholder="1000" min="1"></div>
-    <div><label>Акк после (%)</label><input type="number" id="a_jacks" placeholder="96.50" step="0.01" min="0" max="100"></div>
-  </div>
+        <div class="map-row">
+            <span class="badge b-jack">ДЖЕКИ</span>
+            <div class="input-group">
+                <label>Ноты</label>
+                <input type="number" id="n1">
+            </div>
+            <div class="input-group">
+                <label>Акк после (%)</label>
+                <input type="number" id="a1" step="0.01">
+            </div>
+        </div>
 
-  <div class="map-row">
-    <div><span class="map-label tech">ТЕХНО</span></div>
-    <div><label>Нот</label><input type="number" id="n_tech" placeholder="800" min="1"></div>
-    <div><label>Акк после (%)</label><input type="number" id="a_tech" placeholder="95.20" step="0.01" min="0" max="100"></div>
-  </div>
+        <div class="map-row">
+            <span class="badge b-tech">ТЕХНО</span>
+            <div class="input-group">
+                <label>Ноты</label>
+                <input type="number" id="n2">
+            </div>
+            <div class="input-group">
+                <label>Акк после (%)</label>
+                <input type="number" id="a2" step="0.01">
+            </div>
+        </div>
 
-  <div class="map-row">
-    <div><span class="map-label speed">СПИД</span></div>
-    <div><label>Нот</label><input type="number" id="n_speed" placeholder="1200" min="1"></div>
-    <div><label>Акк после (%)</label><input type="number" id="a_speed" placeholder="94.80" step="0.01" min="0" max="100"></div>
-  </div>
+        <div class="map-row">
+            <span class="badge b-speed">СПИД</span>
+            <div class="input-group">
+                <label>Ноты</label>
+                <input type="number" id="n3">
+            </div>
+            <div class="input-group">
+                <label>Акк после (%)</label>
+                <input type="number" id="a3" step="0.01">
+            </div>
+        </div>
 
-  <div class="map-row">
-    <div><span class="map-label stam">СТАМИНА</span></div>
-    <div><label>Нот</label><input type="number" id="n_stam" placeholder="1500" min="1"></div>
-    <div><label>Акк после (%)</label><input type="number" id="a_stam" placeholder="93.50" step="0.01" min="0" max="100"></div>
-  </div>
+        <div class="map-row">
+            <span class="badge b-stamina">СТАМИНА</span>
+            <div class="input-group">
+                <label>Ноты</label>
+                <input type="number" id="n4">
+            </div>
+            <div class="input-group">
+                <label>Акк после (%)</label>
+                <input type="number" id="a4" step="0.01">
+            </div>
+        </div>
 
-  <div class="error" id="error">⚠ Заполни все поля корректно</div>
-  <button onclick="calculate()">ПОСЧИТАТЬ</button>
+        <button class="calc-btn" onclick="calculate()">ПОСЧИТАТЬ</button>
 
-  <div class="results" id="results">
-    <div style="margin-bottom:8px; margin-top:14px;" class="section-label">Индивидуальная аккуратность</div>
-    <div class="result-row">
-      <span class="map-label jacks">ДЖЕКИ</span>
-      <span class="result-val" id="r_jacks">—</span>
+        <div id="results">
+            <div class="section-title">ИНДИВИДУАЛЬНАЯ АККУРАТНОСТЬ</div>
+            <div class="res-row"><span class="badge b-jack">ДЖЕКИ</span> <span id="r1" class="res-val c-jack">-</span></div>
+            <div class="res-row"><span class="badge b-tech">ТЕХНО</span> <span id="r2" class="res-val c-tech">-</span></div>
+            <div class="res-row"><span class="badge b-speed">СПИД</span> <span id="r3" class="res-val c-speed">-</span></div>
+            <div class="res-row"><span class="badge b-stamina">СТАМИНА</span> <span id="r4" class="res-val c-stamina">-</span></div>
+        </div>
     </div>
-    <div class="result-row">
-      <span class="map-label tech">ТЕХНО</span>
-      <span class="result-val" id="r_tech">—</span>
-    </div>
-    <div class="result-row">
-      <span class="map-label speed">СПИД</span>
-      <span class="result-val" id="r_speed">—</span>
-    </div>
-    <div class="result-row">
-      <span class="map-label stam">СТАМИНА</span>
-      <span class="result-val" id="r_stam">—</span>
-    </div>
-  </div>
 
+    <div class="sidebar">
+        <div class="section-title" style="margin-top: 0;">ПРЕСЕТЫ НОТ</div>
+        <button class="preset-btn" onclick="fillNotes('dan1')">dan 1st</button>
+        <button class="preset-btn" onclick="fillNotes('dan2')">dan 2nd</button>
+        <button class="preset-btn" onclick="fillNotes('dan3')">dan 3rd</button>
+        <button class="preset-btn" onclick="fillNotes('dan4')">dan 4th</button>
+        <button class="preset-btn" onclick="fillNotes('dan5')">dan 5th</button>
+        <button class="preset-btn" onclick="fillNotes('dan6')">dan 6th</button>
+        <button class="preset-btn" onclick="fillNotes('dan7')">dan 7th</button>
+        <button class="preset-btn" onclick="fillNotes('dan8')">dan 8th</button>
+        <button class="preset-btn" onclick="fillNotes('dan9')">dan 9th</button>
+        <button class="preset-btn" onclick="fillNotes('dan10')">dan 10th</button>
+        <button class="preset-btn" onclick="fillNotes('alpha')">alpha</button>
+        <button class="preset-btn" onclick="fillNotes('beta')">beta</button>
+        <button class="preset-btn" onclick="fillNotes('gamma')">gamma</button>
+        <button class="preset-btn" onclick="fillNotes('delta')">delta</button>
+        <button class="preset-btn" onclick="fillNotes('epsilon')">epsilon</button>
+    </div>
 </div>
+
 <script>
-  function colorClass(v) {
-    if (v >= 97) return 'good';
-    if (v >= 93) return 'ok';
-    return 'bad';
-  }
-  function getIndividual(xPast, xNew, nPast, nNew) {
-    return ((xNew / 100 * (nPast + nNew) - xPast / 100 * nPast) / nNew) * 100;
-  }
-  function setResult(id, val) {
-    const el = document.getElementById(id);
-    el.textContent = val.toFixed(2) + '%';
-    el.className = 'result-val ' + colorClass(val);
-  }
-  function calculate() {
-    const nJ  = parseFloat(document.getElementById('n_jacks').value);
-    const nT  = parseFloat(document.getElementById('n_tech').value);
-    const nS  = parseFloat(document.getElementById('n_speed').value);
-    const nSt = parseFloat(document.getElementById('n_stam').value);
-    const aJ  = parseFloat(document.getElementById('a_jacks').value);
-    const aT  = parseFloat(document.getElementById('a_tech').value);
-    const aS  = parseFloat(document.getElementById('a_speed').value);
-    const aSt = parseFloat(document.getElementById('a_stam').value);
-    const err = document.getElementById('error');
-    if ([nJ,nT,nS,nSt,aJ,aT,aS,aSt].some(isNaN)) {
-      err.classList.add('visible');
-      document.getElementById('results').classList.remove('visible');
-      return;
+// =====================================================================
+// ТУТ ВВОДИТЬ КОЛИЧЕСТВО НОТ ДЛЯ ПРЕСЕТОВ
+// Порядок: [Ноты Джеки, Ноты Техно, Ноты Спид, Ноты Стамина]
+// Заменяй единички на реальные числа!
+// =====================================================================
+const danData = {
+    'dan1': [878, 696, 954, 1167],
+    'dan2': [1107, 905, 955, 1487],
+    'dan3': [905, 797, 1047, 1259],
+    'dan4': [980, 1499, 1283, 2071],
+    'dan5': [1293, 1722, 1126, 1903],
+    'dan6': [1487, 1266, 1378, 2186],
+    'dan7': [2114, 1777, 1081, 2736],
+    'dan8': [2117, 1309, 1608, 1589],
+    'dan9': [2114, 2070, 1637, 2272],
+    'dan10': [1906, 1460, 1723, 2392],
+    'alpha': [2265, 1528, 2300, 3334],
+    'beta': [2274, 2308, 1740, 2301],
+    'gamma': [1973, 1980, 1429, 3979],
+    'delta': [2018, 2711, 3268, 2629],
+    'epsilon': [2128, 2552, 2194, 2829]
+};
+// =====================================================================
+
+// Функция подстановки нот при нажатии на пресет
+function fillNotes(danName) {
+    const notes = danData[danName];
+    if (notes) {
+        document.getElementById('n1').value = notes[0];
+        document.getElementById('n2').value = notes[1];
+        document.getElementById('n3').value = notes[2];
+        document.getElementById('n4').value = notes[3];
     }
-    err.classList.remove('visible');
-    setResult('r_jacks', aJ);
-    setResult('r_tech',  getIndividual(aJ, aT, nJ, nT));
-    setResult('r_speed', getIndividual(aT, aS, nJ + nT, nS));
-    setResult('r_stam',  getIndividual(aS, aSt, nJ + nT + nS, nSt));
-    document.getElementById('results').classList.add('visible');
-  }
-  document.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+}
+
+// Основная функция калькулятора
+function calculate() {
+    function getInd(xPast, xNew, nPast, nNew) {
+        if (!nNew) return 0;
+        return (xNew * (nPast + nNew) - xPast * nPast) / nNew;
+    }
+
+    const n = [
+        parseFloat(document.getElementById('n1').value) || 0,
+        parseFloat(document.getElementById('n2').value) || 0,
+        parseFloat(document.getElementById('n3').value) || 0,
+        parseFloat(document.getElementById('n4').value) || 0
+    ];
+    const a = [
+        parseFloat(document.getElementById('a1').value) || 0,
+        parseFloat(document.getElementById('a2').value) || 0,
+        parseFloat(document.getElementById('a3').value) || 0,
+        parseFloat(document.getElementById('a4').value) || 0
+    ];
+
+    const res1 = a[0];
+    const res2 = getInd(a[0], a[1], n[0], n[1]);
+    const res3 = getInd(a[1], a[2], n[0] + n[1], n[2]);
+    const res4 = getInd(a[2], a[3], n[0] + n[1] + n[2], n[3]);
+
+    document.getElementById('r1').innerText = (res1 > 0 ? res1.toFixed(2) + "%" : "-");
+    document.getElementById('r2').innerText = (res2 > 0 ? res2.toFixed(2) + "%" : "-");
+    document.getElementById('r3').innerText = (res3 > 0 ? res3.toFixed(2) + "%" : "-");
+    document.getElementById('r4').innerText = (res4 > 0 ? res4.toFixed(2) + "%" : "-");
+    
+    document.getElementById('results').style.display = 'block';
+}
 </script>
+
 </body>
 </html>
